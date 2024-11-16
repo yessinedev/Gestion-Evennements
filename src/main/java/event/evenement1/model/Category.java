@@ -1,4 +1,4 @@
-package event.evenement1;
+package event.evenement1.model;
 import jakarta.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class Category {
