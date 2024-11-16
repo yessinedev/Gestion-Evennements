@@ -93,7 +93,6 @@ public class UserResource {
                     }
                 }
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)

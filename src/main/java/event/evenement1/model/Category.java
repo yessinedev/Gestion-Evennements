@@ -2,20 +2,24 @@ package event.evenement1.model;
 import jakarta.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class Category {
-	    private String id;
+	    private Long id;
 	    private String name;
 
-	    public Category(String id, String name) {
+	    public Category(Long id, String name) {
 	        this.id = id;
 	        this.name = name;
 	    }
 
-	    // Getters et setters
-	    public String getId() {
+	public Category() {
+
+	}
+
+	// Getters et setters
+	    public Long getId() {
 	        return id;
 	    }
 
-	    public void setId(String id) {
+	    public void setId(Long id) {
 	        this.id = id;
 	    }
 
