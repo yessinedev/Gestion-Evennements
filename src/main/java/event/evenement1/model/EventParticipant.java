@@ -2,22 +2,22 @@ package event.evenement1.model;
 import jakarta.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class EventParticipant {
-    private String id;
+    private Long id;
     private Event event;
     private Users user;
 
-    public EventParticipant(String id, Event event, Users user) {
+    public EventParticipant(Long id, Event event, Users user) {
         this.id = id;
         this.event = event;
         this.user = user;
     }
-
-    // Getters et setters
-    public String getId() {
+    public EventParticipant() {}
+   
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
