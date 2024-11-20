@@ -8,11 +8,8 @@ import java.util.Properties;
 
 public class DatabaseConnection {
 
-    private static Connection connection = null;
-
     public static Connection getConnection() {
-        if (connection != null) return connection;
-
+        Connection connection = null;
         try (InputStream input = DatabaseConnection.class.getClassLoader().getResourceAsStream("db.properties")) {
             Properties properties = new Properties();
             properties.load(input);
@@ -20,6 +17,7 @@ public class DatabaseConnection {
             String url = properties.getProperty("db.url");
             String username = properties.getProperty("db.username");
             String password = properties.getProperty("db.password");
+
             // Register MySQL driver
             Class.forName("com.mysql.cj.jdbc.Driver");
 
@@ -30,15 +28,6 @@ public class DatabaseConnection {
         return connection;
     }
 
-    public static void closeConnection() {
-        if (connection != null) {
-            try {
-                connection.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-    }
     public static void main(String[] args) {
         try (Connection connection = DatabaseConnection.getConnection()) {
             if (connection != null) {

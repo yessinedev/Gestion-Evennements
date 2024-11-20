@@ -1,12 +1,10 @@
 package event.evenement1.model;
 
-import event.evenement1.EventParticipant;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
 public class Event {
-    private String id;
+    private Long id;
     private String name;
     private String description;
     private LocalDateTime date;
@@ -18,8 +16,8 @@ public class Event {
     private Category category;
     private Users organizer;
     private List<EventParticipant> participants;
-
-    public Event(String id, String name, String description, LocalDateTime date, String location, String type,
+public Event() {}
+    public Event(Long id, String name, String description, LocalDateTime date, String location, String type,
                  String joinCode, int limitParticipants, Category category, Users organizer) {
         this.id = id;
         this.name = name;
@@ -34,11 +32,11 @@ public class Event {
     }
 
     // Getters et setters
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
