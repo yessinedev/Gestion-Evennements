@@ -1,7 +1,5 @@
 package event.evenement1.model;
 
-import event.evenement1.EventParticipant;
-
 import java.time.LocalDateTime;
 import java.util.List;
 

@@ -1,6 +1,4 @@
-package event.evenement1;
-import event.evenement1.model.Event;
-import event.evenement1.model.Users;
+package event.evenement1.model;
 import jakarta.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class EventParticipant {
