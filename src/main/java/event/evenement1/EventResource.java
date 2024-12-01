@@ -164,6 +164,72 @@ public class EventResource {
                            .build();
         }
     }
+//filtrage par nom de categorie:
+    @GET
+    @Path("/category/name/{categoryName}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getEventsByCategoryName(@PathParam("categoryName") String categoryName) {
+        String query = "SELECT e.* FROM events e " +
+                       "JOIN categories c ON e.category_id = c.id " +
+                       "WHERE c.name = ?";
+
+        List<Event> events = new ArrayList<>();
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement ps = connection.prepareStatement(query)) {
+
+            ps.setString(1, categoryName);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    events.add(mapResultSetToEvent(rs));
+                }
+            }
+
+            if (events.isEmpty()) {
+                return Response.status(Response.Status.NOT_FOUND)
+                               .entity("No events found for category name: " + categoryName)
+                               .build();
+            }
+            return Response.ok(events).build();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                           .entity("Error retrieving events by category name: " + e.getMessage())
+                           .build();
+        }
+    }
+//recherche par nom d'evenement
+    @GET
+    @Path("/search/{name}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response searchEventByName(@PathParam("name") String name) {
+        String query = "SELECT * FROM events WHERE name LIKE ?";
+        List<Event> events = new ArrayList<>();
+
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement ps = connection.prepareStatement(query)) {
+
+            ps.setString(1, "%" + name + "%"); // Recherche partielle
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    events.add(mapResultSetToEvent(rs));
+                }
+            }
+
+            if (events.isEmpty()) {
+                return Response.status(Response.Status.NOT_FOUND)
+                               .entity("No events found with name containing: " + name)
+                               .build();
+            }
+
+            return Response.ok(events).build();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                           .entity("Error searching event by name: " + e.getMessage())
+                           .build();
+        }
+    }
 
     
     private Event mapResultSetToEvent(ResultSet rs) throws SQLException {
