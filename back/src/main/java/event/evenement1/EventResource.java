@@ -22,7 +22,7 @@ public class EventResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response createEvent(Event event) {
-        String query = "INSERT INTO events ( name, description, date, location, type, joinCode, limitParticipants, category_id, organizer_id) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO events ( name, description, date, location, type, join_code, limitParticipants, category_id, organizer_id) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement ps = connection.prepareStatement(query)) {
@@ -104,7 +104,7 @@ public class EventResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateEvent(@PathParam("id") String id, Event event) {
-        String query = "UPDATE events SET name = ?, description = ?, date = ?, location = ?, type = ?, joinCode = ?, limitParticipants = ?, category_id = ?, organizer_id = ? WHERE id = ?";
+        String query = "UPDATE events SET name = ?, description = ?, date = ?, location = ?, type = ?, join_code = ?, limitParticipants = ?, category_id = ?, organizer_id = ? WHERE id = ?";
 
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement ps = connection.prepareStatement(query)) {
@@ -238,7 +238,7 @@ public class EventResource {
             rs.getTimestamp("date").toLocalDateTime(),
             rs.getString("location"),
             rs.getString("type"),
-            rs.getString("joinCode"),
+            rs.getString("join_code"),
             rs.getInt("limitParticipants"),
             new Category(rs.getLong("category_id"), null), 
             new Users(rs.getLong("organizer_id"), null, null, null) 
