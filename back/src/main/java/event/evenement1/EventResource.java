@@ -22,7 +22,7 @@ public class EventResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response createEvent(Event event) {
-        String query = "INSERT INTO events ( name, description, date, location, type, join_code, limitParticipants, category_id, organizer_id) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO events ( name, description, date, location, type, join_code, limit_participants, category_id, organizer_id) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement ps = connection.prepareStatement(query)) {
@@ -104,7 +104,7 @@ public class EventResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateEvent(@PathParam("id") String id, Event event) {
-        String query = "UPDATE events SET name = ?, description = ?, date = ?, location = ?, type = ?, join_code = ?, limitParticipants = ?, category_id = ?, organizer_id = ? WHERE id = ?";
+        String query = "UPDATE events SET name = ?, description = ?, date = ?, location = ?, type = ?, join_code = ?, limit_participants = ?, category_id = ?, organizer_id = ? WHERE id = ?";
 
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement ps = connection.prepareStatement(query)) {
@@ -239,7 +239,7 @@ public class EventResource {
             rs.getString("location"),
             rs.getString("type"),
             rs.getString("join_code"),
-            rs.getInt("limitParticipants"),
+            rs.getInt("limit_participants"),
             new Category(rs.getLong("category_id"), null), 
             new Users(rs.getLong("organizer_id"), null, null, null) 
         );
@@ -250,7 +250,7 @@ public class EventResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response participateInEvent(@PathParam("eventId") Long eventId, Users user) {
-        String checkEventQuery = "SELECT limitParticipants FROM events WHERE id = ?";
+        String checkEventQuery = "SELECT limit_participants FROM events WHERE id = ?";
         String checkParticipantQuery = "SELECT * FROM event_participants WHERE event_id = ? AND user_id = ?";
         String addParticipantQuery = "INSERT INTO event_participants (event_id, user_id) VALUES (?, ?)";
 
@@ -264,7 +264,7 @@ public class EventResource {
                                 .entity("Event not found with ID: " + eventId)
                                 .build();
                     }
-                    int limitParticipants = rs.getInt("limitParticipants");
+                    int limitParticipants = rs.getInt("limit_participants");
 
 
                     String countParticipantsQuery = "SELECT COUNT(*) AS participant_count FROM event_participants WHERE event_id = ?";
