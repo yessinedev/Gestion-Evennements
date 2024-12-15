@@ -1,8 +1,10 @@
 package event.evenement1.model;
+import jakarta.json.bind.annotation.JsonbTransient;
 import jakarta.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class EventParticipant {
     private Long id;
+    @JsonbTransient // Prevent serialization of the event reference
     private Event event;
     private Users user;
 

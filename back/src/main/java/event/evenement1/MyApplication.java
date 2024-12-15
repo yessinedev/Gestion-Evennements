@@ -4,7 +4,7 @@ import jakarta.ws.rs.core.Application;
 import java.util.HashSet;
 import java.util.Set;
 
-@ApplicationPath("/api") // Define the base URI for your RESTful services.
+@ApplicationPath("/api")
 public class MyApplication extends Application {
 
     @Override
