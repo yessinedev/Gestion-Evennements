@@ -18,7 +18,7 @@ public class Event {
     private List<EventParticipant> participants;
 public Event() {}
     public Event(Long id, String name, String description, LocalDateTime date, String location, String type,
-                 String joinCode, int limitParticipants, Category category, Users organizer) {
+                 String joinCode, int limitParticipants, Category category, Users organizer, List<EventParticipant> participants) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -29,6 +29,7 @@ public Event() {}
         this.limitParticipants = limitParticipants;
         this.category = category;
         this.organizer = organizer;
+        this.participants = participants;
     }
 
     // Getters et setters

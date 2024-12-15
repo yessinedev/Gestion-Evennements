@@ -3,6 +3,7 @@ package event.evenement1;
 import event.evenement1.bd.DatabaseConnection;
 import event.evenement1.model.Event;
 import event.evenement1.model.Category;
+import event.evenement1.model.EventParticipant;
 import event.evenement1.model.Users;
 
 import jakarta.ws.rs.*;
@@ -17,12 +18,12 @@ import java.util.List;
 @Path("/events")
 public class EventResource {
 
-   
+
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response createEvent(Event event) {
-        String query = "INSERT INTO events ( name, description, date, location, type, joinCode, limitParticipants, category_id, organizer_id) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO events ( name, description, date, location, type, join_code, limit_participants, category_id, organizer_id) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement ps = connection.prepareStatement(query)) {
@@ -38,13 +39,13 @@ public class EventResource {
 
             ps.executeUpdate();
             return Response.status(Response.Status.CREATED)
-                           .entity("Event created successfully!")
-                           .build();
+                    .entity("Event created successfully!")
+                    .build();
         } catch (SQLException e) {
             e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                           .entity("Error creating event: " + e.getMessage())
-                           .build();
+                    .entity("Error creating event: " + e.getMessage())
+                    .build();
         }
     }
 
@@ -52,7 +53,14 @@ public class EventResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllEvents() {
-        String query = "SELECT * FROM events";
+        String query = "SELECT \n" +
+                "        e.id, e.name, e.description, e.date, e.location, e.type, \n" +
+                "        e.join_code, e.limit_participants, \n" +
+                "        c.id AS category_id, c.name AS category_name, \n" +
+                "        u.id AS organizer_id, u.name AS organizer_name\n" +
+                "    FROM events e\n" +
+                "    JOIN categories c ON e.category_id = c.id\n" +
+                "    JOIN users u ON e.organizer_id = u.id";
         List<Event> events = new ArrayList<>();
 
         try (Connection connection = DatabaseConnection.getConnection();
@@ -66,8 +74,8 @@ public class EventResource {
         } catch (SQLException e) {
             e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                           .entity("Error retrieving events: " + e.getMessage())
-                           .build();
+                    .entity("Error retrieving events: " + e.getMessage())
+                    .build();
         }
     }
 
@@ -87,15 +95,15 @@ public class EventResource {
                     return Response.ok(mapResultSetToEvent(rs)).build();
                 } else {
                     return Response.status(Response.Status.NOT_FOUND)
-                                   .entity("Event not found with ID: " + id)
-                                   .build();
+                            .entity("Event not found with ID: " + id)
+                            .build();
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                           .entity("Error retrieving event: " + e.getMessage())
-                           .build();
+                    .entity("Error retrieving event: " + e.getMessage())
+                    .build();
         }
     }
 
@@ -104,7 +112,7 @@ public class EventResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateEvent(@PathParam("id") String id, Event event) {
-        String query = "UPDATE events SET name = ?, description = ?, date = ?, location = ?, type = ?, joinCode = ?, limitParticipants = ?, category_id = ?, organizer_id = ? WHERE id = ?";
+        String query = "UPDATE events SET name = ?, description = ?, date = ?, location = ?, type = ?, join_code = ?, limit_participants = ?, category_id = ?, organizer_id = ? WHERE id = ?";
 
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement ps = connection.prepareStatement(query)) {
@@ -125,18 +133,18 @@ public class EventResource {
                 return Response.ok("Event updated successfully!").build();
             } else {
                 return Response.status(Response.Status.NOT_FOUND)
-                               .entity("Event not found with ID: " + id)
-                               .build();
+                        .entity("Event not found with ID: " + id)
+                        .build();
             }
         } catch (SQLException e) {
             e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                           .entity("Error updating event: " + e.getMessage())
-                           .build();
+                    .entity("Error updating event: " + e.getMessage())
+                    .build();
         }
     }
 
-  
+
     @DELETE
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -152,24 +160,25 @@ public class EventResource {
                 return Response.ok("Event deleted successfully!").build();
             } else {
                 return Response.status(Response.Status.NOT_FOUND)
-                               .entity("Event not found with ID: " + id)
-                               .build();
+                        .entity("Event not found with ID: " + id)
+                        .build();
             }
         } catch (SQLException e) {
             e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                           .entity("Error deleting event: " + e.getMessage())
-                           .build();
+                    .entity("Error deleting event: " + e.getMessage())
+                    .build();
         }
     }
-//filtrage par nom de categorie:
+
+    //filtrage par nom de categorie:
     @GET
     @Path("/category/name/{categoryName}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getEventsByCategoryName(@PathParam("categoryName") String categoryName) {
         String query = "SELECT e.* FROM events e " +
-                       "JOIN categories c ON e.category_id = c.id " +
-                       "WHERE c.name = ?";
+                "JOIN categories c ON e.category_id = c.id " +
+                "WHERE c.name = ?";
 
         List<Event> events = new ArrayList<>();
         try (Connection connection = DatabaseConnection.getConnection();
@@ -185,18 +194,19 @@ public class EventResource {
 
             if (events.isEmpty()) {
                 return Response.status(Response.Status.NOT_FOUND)
-                               .entity("No events found for category name: " + categoryName)
-                               .build();
+                        .entity("No events found for category name: " + categoryName)
+                        .build();
             }
             return Response.ok(events).build();
         } catch (SQLException e) {
             e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                           .entity("Error retrieving events by category name: " + e.getMessage())
-                           .build();
+                    .entity("Error retrieving events by category name: " + e.getMessage())
+                    .build();
         }
     }
-//recherche par nom d'evenement
+
+    //recherche par nom d'evenement
     @GET
     @Path("/search/{name}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -216,33 +226,92 @@ public class EventResource {
 
             if (events.isEmpty()) {
                 return Response.status(Response.Status.NOT_FOUND)
-                               .entity("No events found with name containing: " + name)
-                               .build();
+                        .entity("No events found with name containing: " + name)
+                        .build();
             }
 
             return Response.ok(events).build();
         } catch (SQLException e) {
             e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                           .entity("Error searching event by name: " + e.getMessage())
-                           .build();
+                    .entity("Error searching event by name: " + e.getMessage())
+                    .build();
         }
     }
 
-    
+    private List<EventParticipant> getEventParticipants(Long eventId) throws SQLException {
+        String query = " SELECT \n" +
+                "            ep.id AS participant_id, \n" +
+                "            u.id AS user_id, \n" +
+                "            u.name AS user_name, \n" +
+                "            u.email AS user_email \n" +
+                "        FROM \n" +
+                "            event_participants ep \n" +
+                "        JOIN \n" +
+                "            users u \n" +
+                "        ON \n" +
+                "            ep.user_id = u.id \n" +
+                "        WHERE \n" +
+                "            ep.event_id = ?";
+
+        List<EventParticipant> participants = new ArrayList<>();
+
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement ps = connection.prepareStatement(query)) {
+
+            ps.setLong(1, eventId); // Set the event ID
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    // Create Users object
+                    Users user = new Users(
+                            rs.getLong("user_id"),
+                            rs.getString("user_name"),
+                            rs.getString("user_email"),
+                            null // Add other user fields as necessary
+                    );
+
+                    // Create EventParticipant object
+                    EventParticipant participant = new EventParticipant(
+                            rs.getLong("participant_id"),
+                            null, // Event object will be set later
+                            user
+                    );
+
+                    participants.add(participant);
+                }
+            }
+        }
+
+        return participants;
+    }
+
+
     private Event mapResultSetToEvent(ResultSet rs) throws SQLException {
-        return new Event(
-            rs.getLong("id"),
-            rs.getString("name"),
-            rs.getString("description"),
-            rs.getTimestamp("date").toLocalDateTime(),
-            rs.getString("location"),
-            rs.getString("type"),
-            rs.getString("joinCode"),
-            rs.getInt("limitParticipants"),
-            new Category(rs.getLong("category_id"), null), 
-            new Users(rs.getLong("organizer_id"), null, null, null) 
-        );
+        Event event = new Event(
+                rs.getLong("id"),
+                rs.getString("name"),
+                rs.getString("description"),
+                rs.getTimestamp("date").toLocalDateTime(),
+                rs.getString("location"),
+                rs.getString("type"),
+                rs.getString("join_code"),
+                rs.getInt("limit_participants"),
+                new Category(rs.getLong("category_id"), rs.getString("category_name")),
+                new Users(rs.getLong("organizer_id"), rs.getString("organizer_name"), null, null),
+                new ArrayList<>()
+                );
+
+        List<EventParticipant> participants = getEventParticipants(event.getId());
+
+        for (EventParticipant participant : participants) {
+            participant.setEvent(event);
+        }
+
+        // Assign the populated participants list to the Event
+        event.setParticipants(participants);
+
+        return event;
+
     }
 
     @POST
@@ -250,7 +319,7 @@ public class EventResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response participateInEvent(@PathParam("eventId") Long eventId, Users user) {
-        String checkEventQuery = "SELECT limitParticipants FROM events WHERE id = ?";
+        String checkEventQuery = "SELECT limit_participants FROM events WHERE id = ?";
         String checkParticipantQuery = "SELECT * FROM event_participants WHERE event_id = ? AND user_id = ?";
         String addParticipantQuery = "INSERT INTO event_participants (event_id, user_id) VALUES (?, ?)";
 
@@ -264,7 +333,7 @@ public class EventResource {
                                 .entity("Event not found with ID: " + eventId)
                                 .build();
                     }
-                    int limitParticipants = rs.getInt("limitParticipants");
+                    int limitParticipants = rs.getInt("limit_participants");
 
 
                     String countParticipantsQuery = "SELECT COUNT(*) AS participant_count FROM event_participants WHERE event_id = ?";
@@ -308,6 +377,7 @@ public class EventResource {
                     .build();
         }
     }
+
     //leave
     @DELETE
     @Path("/{eventId}/leave")
