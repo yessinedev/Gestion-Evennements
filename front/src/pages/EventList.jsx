@@ -1,11 +1,21 @@
-import React, { useState} from 'react';
+import React, { useEffect, useState} from 'react';
 import { SearchIcon } from 'lucide-react';
 import { EventCard } from '../components/EventCard';
+import axios from 'axios';
 
 
 export function EventList() {
   const [search, setSearch] = useState('');
   const [events, setEvents] = useState([])
+
+  const fetchEvents = async () => {
+    const {data} = await axios.get('http://localhost:8080/evenement1_war/api/events')
+    setEvents(data)
+  }
+
+  useEffect(() => {
+    fetchEvents()
+  }, [])
 
   return (
     <div className="max-w-4xl mx-auto p-6">

@@ -4,13 +4,13 @@ import { CalendarIcon, MapPinIcon, UsersIcon, Edit2Icon, TrashIcon } from 'lucid
 
 
 export function EventCard({ event, onParticipate, onEdit, onDelete, showActions = false }) {
-  const isFullyBooked = event.participants.length >= event.capacity;
+  const isFullyBooked = event.participants.length >= event.limitParticipants;
 
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden">
       <div className="p-6">
         <div className="flex justify-between items-start">
-          <h3 className="text-xl font-semibold text-gray-900">{event.title}</h3>
+          <h3 className="text-xl font-semibold text-gray-900">{event.name}</h3>
           {showActions && (
             <div className="flex space-x-2">
               <button
@@ -44,7 +44,7 @@ export function EventCard({ event, onParticipate, onEdit, onDelete, showActions 
           
           <div className="flex items-center text-gray-600">
             <UsersIcon className="w-4 h-4 mr-2" />
-            <span>{event.participants.length} / {event.capacity} participants</span>
+            <span>{event.participants.length} / {event.limitParticipants} participants</span>
           </div>
         </div>
 
