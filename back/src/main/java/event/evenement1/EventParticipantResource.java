@@ -18,12 +18,18 @@ public class EventParticipantResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response joinEvent(EventParticipant participant) {
+        if (participant == null || participant.getEvent() == null || participant.getEvent().getId() == null ||
+                participant.getUser() == null || participant.getUser().getId() == null) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("Invalid participant data. Please provide event and user details.")
+                    .build();
+        }
+
         String query = "INSERT INTO event_participants (event_id, user_id) VALUES (?, ?)";
 
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement ps = connection.prepareStatement(query)) {
 
-            
             ps.setLong(1, participant.getEvent().getId());
             ps.setLong(2, participant.getUser().getId());
 
@@ -31,19 +37,20 @@ public class EventParticipantResource {
 
             if (rowsInserted > 0) {
                 return Response.status(Response.Status.CREATED)
-                               .entity("User successfully joined the event!")
-                               .build();
+                        .entity("User successfully joined the event!")
+                        .build();
             } else {
                 return Response.status(Response.Status.BAD_REQUEST)
-                               .entity("Failed to join the event. Please try again.")
-                               .build();
+                        .entity("Failed to join the event. Please try again.")
+                        .build();
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                           .entity("Database error: " + e.getMessage())
-                           .build();
+                    .entity("Database error: " + e.getMessage())
+                    .build();
         }
     }
+
 }

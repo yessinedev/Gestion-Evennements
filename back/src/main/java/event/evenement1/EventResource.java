@@ -1,6 +1,8 @@
 package event.evenement1;
 
 import event.evenement1.bd.DatabaseConnection;
+import event.evenement1.dto.EventDTO;
+import event.evenement1.dto.EventParticipantDTO;
 import event.evenement1.model.Event;
 import event.evenement1.model.Category;
 import event.evenement1.model.EventParticipant;
@@ -14,6 +16,7 @@ import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Path("/events")
 public class EventResource {
@@ -61,14 +64,16 @@ public class EventResource {
                 "    FROM events e\n" +
                 "    JOIN categories c ON e.category_id = c.id\n" +
                 "    JOIN users u ON e.organizer_id = u.id";
-        List<Event> events = new ArrayList<>();
+        List<EventDTO> events = new ArrayList<>();
 
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement ps = connection.prepareStatement(query);
              ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-                events.add(mapResultSetToEvent(rs));
+                Event event = mapResultSetToEvent(rs);
+                EventDTO eventDTO = mapToEventDTO(event); // Map Event to EventDTO
+                events.add(eventDTO);
             }
             return Response.ok(events).build();
         } catch (SQLException e) {
@@ -312,6 +317,31 @@ public class EventResource {
 
         return event;
 
+    }
+
+    private EventDTO mapToEventDTO(Event event) {
+        EventDTO dto = new EventDTO();
+        dto.setId(event.getId());
+        dto.setName(event.getName());
+        dto.setDescription(event.getDescription());
+        dto.setDate(event.getDate());
+        dto.setLocation(event.getLocation());
+        dto.setType(event.getType());
+        dto.setJoinCode(event.getJoinCode());
+        dto.setLimitParticipants(event.getLimitParticipants());
+        dto.setCategory(event.getCategory());
+        dto.setOrganizer(event.getOrganizer());
+        dto.setParticipants(event.getParticipants().stream()
+                .map(this::mapToEventParticipantDTO)
+                .collect(Collectors.toList()));
+        return dto;
+    }
+
+    private EventParticipantDTO mapToEventParticipantDTO(EventParticipant participant) {
+        EventParticipantDTO dto = new EventParticipantDTO();
+        dto.setId(participant.getId());
+        dto.setUser(participant.getUser());
+        return dto;
     }
 
     @POST
