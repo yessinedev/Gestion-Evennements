@@ -1,20 +1,26 @@
 import React, { useEffect, useState} from 'react';
 import { SearchIcon } from 'lucide-react';
 import { EventCard } from '../components/EventCard';
-import axios from 'axios';
+import { fetchEvents } from '../services/eventService';
 
 
 export function EventList() {
   const [search, setSearch] = useState('');
   const [events, setEvents] = useState([])
 
-  const fetchEvents = async () => {
-    const {data} = await axios.get('http://localhost:8080/evenement1_war/api/events')
-    setEvents(data)
-  }
+  
 
   useEffect(() => {
-    fetchEvents()
+    const getEvents = async () => {
+      try {
+        const data = await fetchEvents();
+        setEvents(data); // Update state with fetched events
+      } catch (error) {
+        console.error("Error fetching events:", error);
+      }
+    };
+
+    getEvents();
   }, [])
 
   return (

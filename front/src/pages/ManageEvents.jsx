@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { EventForm } from '../components/EventForm';
 import { EventCard } from '../components/EventCard';
+import { fetchEvents } from '../services/eventService';
 
 
 export function ManageEvents() {
@@ -15,6 +16,19 @@ export function ManageEvents() {
       addEvent(eventData);
     }
   };
+
+  useEffect(() => {
+    const getEvents = async () => {
+      try {
+        const data = await fetchEvents();
+        setEvents(data);
+      } catch (error) {
+        console.error("Error fetching events:", error);
+      }
+    };
+
+    getEvents();
+  }, [])
 
   return (
     <div className="max-w-4xl mx-auto p-6">

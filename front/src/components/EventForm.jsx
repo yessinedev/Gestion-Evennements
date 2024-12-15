@@ -4,12 +4,12 @@ import { CalendarIcon, MapPinIcon, UsersIcon } from 'lucide-react';
 
 export function EventForm({ onSubmit, initialData, buttonText = 'Create Event' }) {
   const [formData, setFormData] = useState({
-    title: initialData?.title || '',
+    title: initialData?.name || '',
     description: initialData?.description || '',
     date: initialData?.date || '',
     location: initialData?.location || '',
-    capacity: initialData?.capacity || '',
-    organizer: initialData?.organizer || '',
+    limitParticipants: initialData?.limitParticipants || '',
+    organizer: initialData?.organizer.name || '',
   });
 
   const handleSubmit = (e) => {
@@ -82,12 +82,12 @@ export function EventForm({ onSubmit, initialData, buttonText = 'Create Event' }
         <div>
           <label className="block text-sm font-medium text-gray-700">
             <UsersIcon className="inline-block w-4 h-4 mr-1" />
-            Capacity
+            limitParticipants
           </label>
           <input
             type="number"
-            name="capacity"
-            value={formData.capacity}
+            name="limitParticipants"
+            value={formData.limitParticipants}
             onChange={handleChange}
             min="1"
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
