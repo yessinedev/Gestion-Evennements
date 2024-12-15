@@ -1,5 +1,6 @@
 import React from 'react';
 import { CalendarIcon, MapPinIcon, UsersIcon, Edit2Icon, TrashIcon } from 'lucide-react';
+import { formatDate } from '../utils/dateUtils';
 
 
 
@@ -34,7 +35,7 @@ export function EventCard({ event, onParticipate, onEdit, onDelete, showActions 
         <div className="mt-4 space-y-2">
           <div className="flex items-center text-gray-600">
             <CalendarIcon className="w-4 h-4 mr-2" />
-            <span>{new Date(event.date).toLocaleString()}</span>
+            <span>{formatDate(event.date)}</span>
           </div>
           
           <div className="flex items-center text-gray-600">
