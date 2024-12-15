@@ -3,8 +3,9 @@ import { CalendarIcon, MapPinIcon, UsersIcon } from 'lucide-react';
 
 
 export function EventForm({ onSubmit, initialData, buttonText = 'Create Event' }) {
+  console.log(initialData)
   const [formData, setFormData] = useState({
-    title: initialData?.name || '',
+    name: initialData?.name || '',
     description: initialData?.description || '',
     date: initialData?.date || '',
     location: initialData?.location || '',
@@ -29,7 +30,7 @@ export function EventForm({ onSubmit, initialData, buttonText = 'Create Event' }
         <input
           type="text"
           name="title"
-          value={formData.title}
+          value={formData.name}
           onChange={handleChange}
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
           required
