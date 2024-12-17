@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { UsersIcon } from "lucide-react";
+import { Edit, Trash, UsersIcon } from "lucide-react";
 import { fetchEvents } from "../services/eventService";
 import Select from "react-select";
+import axios from "axios";
 
 export function ParticipantsList() {
   const [events, setEvents] = useState([]);
@@ -31,6 +32,26 @@ export function ParticipantsList() {
     setSelectedEvent(event);
   };
 
+  const handleDeleteParticipant = async (participant) => {
+    console.log(participant);
+    try {
+        await axios({
+            method: "delete",
+            url: "http://localhost:8080/evenement1_war/api/participants",
+            data: participant, // Send participant in the body
+            headers: { "Content-Type": "application/json" }, // Ensure correct headers
+        });
+        // Update state after deletion
+        setSelectedEvent((prev) => ({
+            ...prev,
+            participants: prev.participants.filter((part) => part.id !== participant.id),
+        }));
+    } catch (error) {
+        console.error("Error deleting participant:", error);
+    }
+};
+
+
   return (
     <div className="max-w-4xl mx-auto p-6">
       <h1 className="text-3xl font-bold text-gray-900 mb-8">
@@ -38,10 +59,14 @@ export function ParticipantsList() {
       </h1>
       <div className="py-6">
         <Select
-          options={eventOptions} 
-          value={selectedEvent ? { value: selectedEvent.id, label: selectedEvent.name } : null} 
-          onChange={(selectedOption) => handleSelectChange(selectedOption)} 
-          placeholder="Select an event" 
+          options={eventOptions}
+          value={
+            selectedEvent
+              ? { value: selectedEvent.id, label: selectedEvent.name }
+              : null
+          }
+          onChange={(selectedOption) => handleSelectChange(selectedOption)}
+          placeholder="Select an event"
         />
       </div>
       <div className="space-y-6">
@@ -57,7 +82,8 @@ export function ParticipantsList() {
               <div className="flex items-center text-gray-600">
                 <UsersIcon className="w-5 h-5 mr-2" />
                 <span>
-                  {selectedEvent.participants.length} / {selectedEvent.limitParticipants}
+                  {selectedEvent.participants.length} /{" "}
+                  {selectedEvent.limitParticipants}
                 </span>
               </div>
             </div>
@@ -72,9 +98,11 @@ export function ParticipantsList() {
                     <span className="text-gray-800">
                       {participant.user.name}
                     </span>
-                    <span className="text-sm text-gray-500">
-                      Participant #{index + 1}
-                    </span>
+                    <button
+                      onClick={() => handleDeleteParticipant(participant)}
+                    >
+                      <Trash />
+                    </button>
                   </li>
                 ))}
               </ul>
