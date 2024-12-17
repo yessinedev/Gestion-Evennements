@@ -341,6 +341,7 @@ public class EventResource {
         EventParticipantDTO dto = new EventParticipantDTO();
         dto.setId(participant.getId());
         dto.setUser(participant.getUser());
+        dto.setEventId(participant.getEvent().getId());
         return dto;
     }
 

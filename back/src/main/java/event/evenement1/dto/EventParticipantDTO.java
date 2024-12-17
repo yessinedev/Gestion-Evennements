@@ -5,6 +5,7 @@ import event.evenement1.model.Users;
 public class EventParticipantDTO {
     private Long id;
     private Users user;
+    private Long eventId;
 
 
 
@@ -24,5 +25,11 @@ public class EventParticipantDTO {
         this.user = user;
     }
 
+    public Long getEventId() {
+        return eventId;
+    }
 
+    public void setEventId(Long eventId) {
+        this.eventId = eventId;
+    }
 }
