@@ -3,19 +3,28 @@ import { EventForm } from '../components/EventForm';
 import { EventCard } from '../components/EventCard';
 import { fetchEvents, createEvent, updateEvent, deleteEvent } from '../services/eventService';
 import { fetchCategories } from '../services/categoryService';
+import axios from 'axios';
+import { fetchUsers } from '../services/userService';
 
 export function ManageEvents() {
   const [editingEvent, setEditingEvent] = useState(null);
   const [events, setEvents] = useState([]);
   const [categories, setCategories] = useState([]); // État pour les catégories
+  const [users, setUsers] = useState([]); // État pour les utilisateurs
 
   const handleSubmit = async (event) => {
+
     try {
       if (editingEvent) {
         await updateEvent(editingEvent, event);
         alert('Event updated successfully!');
       } else {
-        await createEvent(event);
+        await axios({
+                method: "post",
+                url: `${import.meta.env.VITE_API_BASE_URL}/events`,
+                data: event, // Send participant in the body
+                headers: { "Content-Type": "application/json" }, // Ensure correct headers
+              });
         alert('Event created successfully!');
       }
       fetchAllEvents();
@@ -44,9 +53,19 @@ export function ManageEvents() {
     }
   };
 
+  const fetchAllUsers = async () => {
+    try {
+      const data = await fetchUsers(); 
+      setUsers(data);
+    } catch (error) {
+      console.error('Error fetching categories:', error.message);
+    }
+  };
+
   useEffect(() => {
     fetchAllEvents();
-    fetchAllCategories(); // Charger les catégories
+    fetchAllCategories();
+    fetchAllUsers();
   }, []);
 
   return (
@@ -60,7 +79,8 @@ export function ManageEvents() {
         <EventForm
           onSubmit={handleSubmit}
           initialData={editingEvent ? events.find((e) => e.id === editingEvent) : undefined}
-          categories={categories} // Passer les catégories au formulaire
+          categories={categories}
+          users={users}
           buttonText={editingEvent ? 'Update Event' : 'Create Event'}
         />
       </div>

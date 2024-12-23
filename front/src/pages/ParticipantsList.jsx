@@ -35,22 +35,23 @@ export function ParticipantsList() {
   const handleDeleteParticipant = async (participant) => {
     console.log(participant);
     try {
-        await axios({
-            method: "delete",
-            url: "http://localhost:8080/evenement1_war/api/participants",
-            data: participant, // Send participant in the body
-            headers: { "Content-Type": "application/json" }, // Ensure correct headers
-        });
-        // Update state after deletion
-        setSelectedEvent((prev) => ({
-            ...prev,
-            participants: prev.participants.filter((part) => part.id !== participant.id),
-        }));
+      await axios({
+        method: "delete",
+        url: `${import.meta.env.VITE_API_BASE_URL}/participants`,
+        data: participant, // Send participant in the body
+        headers: { "Content-Type": "application/json" }, // Ensure correct headers
+      });
+      // Update state after deletion
+      setSelectedEvent((prev) => ({
+        ...prev,
+        participants: prev.participants.filter(
+          (part) => part.id !== participant.id
+        ),
+      }));
     } catch (error) {
-        console.error("Error deleting participant:", error);
+      console.error("Error deleting participant:", error);
     }
-};
-
+  };
 
   return (
     <div className="max-w-4xl mx-auto p-6">

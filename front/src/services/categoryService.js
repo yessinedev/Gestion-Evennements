@@ -1,6 +1,6 @@
 import axios from 'axios';
 
 export const fetchCategories = async () => {
-    const { data } = await axios.get('http://localhost:8080/evenement1/api/categories')
+    const { data } = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/categories`);
     return data;
 };

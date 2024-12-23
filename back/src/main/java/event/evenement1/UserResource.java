@@ -4,6 +4,9 @@ import event.evenement1.bd.DatabaseConnection;
 import event.evenement1.model.Users;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.*;
 
@@ -100,4 +103,39 @@ public class UserResource {
                     .build();
         }
     }
+
+    // Méthode pour obtenir la liste des utilisateurs
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getUsers() {
+        try (Connection connection = DatabaseConnection.getConnection()) {
+            String getUsersQuery = "SELECT * FROM users";
+            try (PreparedStatement ps = connection.prepareStatement(getUsersQuery)) {
+                try (ResultSet rs = ps.executeQuery()) {
+                    // Créer une liste pour stocker les utilisateurs
+                    List<Users> userList = new ArrayList<>();
+
+                    while (rs.next()) {
+                        Users user = new Users(
+                                rs.getLong("id"),
+                                rs.getString("name"),
+                                rs.getString("email"),
+                                rs.getString("password")
+                        );
+                        userList.add(user);
+                    }
+
+                    return Response.status(Response.Status.OK)
+                            .entity(userList)
+                            .build();
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Database error occurred.")
+                    .build();
+        }
+    }
+
 }

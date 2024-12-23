@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { CalendarIcon, MapPinIcon, UsersIcon } from 'lucide-react';
 
-export function EventForm({ onSubmit, initialData, categories, buttonText = 'Create Event' }) {
+export function EventForm({ onSubmit, initialData, categories, users, buttonText = 'Create Event' }) {
   const [formData, setFormData] = useState({
     name: initialData?.name || '',
     description: initialData?.description || '',
     date: initialData?.date || '',
     location: initialData?.location || '',
     limitParticipants: initialData?.limitParticipants || '',
-    organizer: initialData?.organizer || '', 
-    category: initialData?.category || { id: '' }, 
+    organizer: initialData?.organizer || { id: '', name: '',},
+    category: initialData?.category || { id: '', name: '' }, 
   });
 
   const handleSubmit = (e) => {
@@ -20,9 +20,13 @@ export function EventForm({ onSubmit, initialData, categories, buttonText = 'Cre
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    const newValue = name === 'category' || name === 'organizer'
+      ? { id: parseInt(value, 10), name: e.target.selectedOptions[0].text }
+      : value;
+console.log(newValue);
     setFormData((prev) => ({
       ...prev,
-      [name]: name === 'category' ? { id: parseInt(value, 10) } : value, 
+      [name]: newValue,
     }));
   };
 
@@ -101,17 +105,23 @@ export function EventForm({ onSubmit, initialData, categories, buttonText = 'Cre
 
         <div>
           <label className="block text-sm font-medium text-gray-700">Organizer</label>
-          <input
-            type="text"
+          <select
             name="organizer"
-            value={formData.organizer}
+            value={formData.organizer.id}
             onChange={handleChange}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             required
-          />
+          >
+            <option value=""></option>
+            {users?.map((user) => (
+              <option key={user.id} value={user.id}>
+                {user.name}
+              </option>
+            ))}
+          </select>
         </div>
 
-        {/* Champ pour la catégorie */}
+       
         <div>
           <label className="block text-sm font-medium text-gray-700">Category</label>
           <select
