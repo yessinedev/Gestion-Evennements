@@ -1,26 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { CalendarIcon, MapPinIcon, UsersIcon } from 'lucide-react';
 
-
-export function EventForm({ onSubmit, initialData, buttonText = 'Create Event' }) {
-  console.log(initialData)
+export function EventForm({ onSubmit, initialData, categories, buttonText = 'Create Event' }) {
   const [formData, setFormData] = useState({
     name: initialData?.name || '',
     description: initialData?.description || '',
     date: initialData?.date || '',
     location: initialData?.location || '',
     limitParticipants: initialData?.limitParticipants || '',
-    organizer: initialData?.organizer.name || '',
+    organizer: initialData?.organizer || '', 
+    category: initialData?.category || { id: '' }, 
   });
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    console.log('Form Data:', formData);
     onSubmit(formData);
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({
+      ...prev,
+      [name]: name === 'category' ? { id: parseInt(value, 10) } : value, 
+    }));
   };
 
   return (
@@ -29,8 +32,8 @@ export function EventForm({ onSubmit, initialData, buttonText = 'Create Event' }
         <label className="block text-sm font-medium text-gray-700">Title</label>
         <input
           type="text"
-          name="title"
-          value={formData.name}
+          name="name"
+          value={formData.name} 
           onChange={handleChange}
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
           required
@@ -83,7 +86,7 @@ export function EventForm({ onSubmit, initialData, buttonText = 'Create Event' }
         <div>
           <label className="block text-sm font-medium text-gray-700">
             <UsersIcon className="inline-block w-4 h-4 mr-1" />
-            limitParticipants
+            Limit Participants
           </label>
           <input
             type="number"
@@ -106,6 +109,25 @@ export function EventForm({ onSubmit, initialData, buttonText = 'Create Event' }
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             required
           />
+        </div>
+
+        {/* Champ pour la catégorie */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Category</label>
+          <select
+            name="category"
+            value={formData.category.id}
+            onChange={handleChange}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            required
+          >
+            <option value=""></option>
+            {categories?.map((category) => (
+              <option key={category.id} value={category.id}>
+                {category.name}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
 

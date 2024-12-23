@@ -4,14 +4,16 @@ import { EventCard } from "../components/EventCard";
 import { fetchEvents, participateToEvent } from "../services/eventService";
 
 export function EventList() {
-  const [search, setSearch] = useState("");
-  const [events, setEvents] = useState([]);
-
+  const [search, setSearch] = useState(""); 
+  const [events, setEvents] = useState([]); 
+  const [filteredEvents, setFilteredEvents] = useState([]); 
+  // Charger les événements au montage
   useEffect(() => {
     const getEvents = async () => {
       try {
         const data = await fetchEvents();
-        setEvents(data); // Update state with fetched events
+        setEvents(data);
+        setFilteredEvents(data); 
       } catch (error) {
         console.error("Error fetching events:", error);
       }
@@ -19,6 +21,14 @@ export function EventList() {
 
     getEvents();
   }, []);
+
+  // Filtrer les événements en fonction de la recherche
+  useEffect(() => {
+    const filtered = events.filter((event) =>
+      event.name.toLowerCase().includes(search.toLowerCase())
+    );
+    setFilteredEvents(filtered);
+  }, [search, events]);
 
   const participateInEvent = async (eventId) => {
     let userId = prompt("Please enter the user id");
@@ -32,9 +42,13 @@ export function EventList() {
           id: userId,
         },
       };
-      await participateToEvent(participant)
-        .then((res) => console.log(res))
-        .catch((error) => console.log(error.message));
+      try {
+        await participateToEvent(participant);
+        alert("Participation successful!");
+      } catch (error) {
+        console.error("Error participating in event:", error.message);
+        alert("Failed to participate in the event.");
+      }
     }
   };
 
@@ -42,6 +56,7 @@ export function EventList() {
     <div className="max-w-4xl mx-auto p-6">
       <h1 className="text-3xl font-bold text-gray-900 mb-8">Upcoming Events</h1>
 
+      {/* Barre de recherche */}
       <div className="relative mb-8">
         <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
         <input
@@ -53,14 +68,19 @@ export function EventList() {
         />
       </div>
 
+      {/* Liste des événements */}
       <div className="grid gap-6 md:grid-cols-2">
-        {events?.map((event) => (
-          <EventCard
-            key={event.id}
-            event={event}
-            onParticipate={() => participateInEvent(event.id)}
-          />
-        ))}
+        {filteredEvents.length > 0 ? (
+          filteredEvents.map((event) => (
+            <EventCard
+              key={event.id}
+              event={event}
+              onParticipate={() => participateInEvent(event.id)}
+            />
+          ))
+        ) : (
+          <p className="text-gray-500 italic">No events match your search.</p>
+        )}
       </div>
     </div>
   );
