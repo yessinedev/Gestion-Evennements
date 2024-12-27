@@ -9,32 +9,59 @@ import { fetchUsers } from '../services/userService';
 export function ManageEvents() {
   const [editingEvent, setEditingEvent] = useState(null);
   const [events, setEvents] = useState([]);
-  const [categories, setCategories] = useState([]); // État pour les catégories
-  const [users, setUsers] = useState([]); // État pour les utilisateurs
+  const [categories, setCategories] = useState([]); 
+  const [users, setUsers] = useState([]); 
 
   const handleSubmit = async (event) => {
-
     try {
       if (editingEvent) {
-        await updateEvent(editingEvent, event);
+        // Modification d'un événement 
+        await axios({
+          method: "put",
+          url: `${import.meta.env.VITE_API_BASE_URL}/events/${editingEvent}`, 
+          data: event, 
+          headers: { "Content-Type": "application/json" }, 
+        });
         alert('Event updated successfully!');
       } else {
+        // Création d'un nouvel événement 
         await axios({
-                method: "post",
-                url: `${import.meta.env.VITE_API_BASE_URL}/events`,
-                data: event, // Send participant in the body
-                headers: { "Content-Type": "application/json" }, // Ensure correct headers
-              });
+          method: "post",
+          url: `${import.meta.env.VITE_API_BASE_URL}/events`,
+          data: event, // Envoyer les données de l'événement
+          headers: { "Content-Type": "application/json" }, // Assurer que le bon type est défini
+        });
         alert('Event created successfully!');
       }
-      fetchAllEvents();
-      setEditingEvent(null);
+      fetchAllEvents(); 
+      setEditingEvent(null); 
     } catch (error) {
       console.error('Error submitting event:', error.message);
       alert('Failed to submit event. Please try again.');
     }
   };
 
+
+
+  const handleDelete = async (eventId) => {
+    try {
+      // Suppression d'un événement 
+      await axios({
+        method: "delete",
+        url: `${import.meta.env.VITE_API_BASE_URL}/events/${eventId}`, 
+        headers: {
+          "Content-Type": "application/json", 
+        },
+      });
+      alert('Event deleted successfully!');
+      fetchAllEvents();
+    } catch (error) {
+      console.error('Error deleting event:', error.message);
+      alert('Failed to delete event. Please try again.');
+    }
+  };
+  
+  
   const fetchAllEvents = async () => {
     try {
       const data = await fetchEvents();
