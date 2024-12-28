@@ -3,15 +3,27 @@ import { CalendarIcon, MapPinIcon, UsersIcon } from 'lucide-react';
 
 export function EventForm({ onSubmit, initialData, categories, users, buttonText = 'Create Event' }) {
   const [formData, setFormData] = useState({
-    name: initialData?.name || '',
-    description: initialData?.description || '',
-    date: initialData?.date || '',
-    location: initialData?.location || '',
-    limitParticipants: initialData?.limitParticipants || '',
-    organizer: initialData?.organizer || { id: '', name: '',},
-    category: initialData?.category || { id: '', name: '' }, 
+    name: '',
+    description: '',
+    date: '',
+    location: '',
+    limitParticipants:  '',
+    organizer: { id: '', name: '',},
+    category: { id: '', name: '' }, 
   });
 
+  useEffect(() => {
+    setFormData({
+      name: initialData?.name || '',
+      description: initialData?.description || '',
+      date: initialData?.date || '',
+      location: initialData?.location || '',
+      limitParticipants: initialData?.limitParticipants || '',
+      organizer: initialData?.organizer || { id: '', name: '' },
+      category: initialData?.category || { id: '', name: '' },
+    });
+  }, [initialData]);
+  
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log('Form Data:', formData);
@@ -23,7 +35,6 @@ export function EventForm({ onSubmit, initialData, categories, users, buttonText
     const newValue = name === 'category' || name === 'organizer'
       ? { id: parseInt(value, 10), name: e.target.selectedOptions[0].text }
       : value;
-console.log(newValue);
     setFormData((prev) => ({
       ...prev,
       [name]: newValue,
