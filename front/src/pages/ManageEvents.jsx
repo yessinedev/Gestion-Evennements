@@ -11,7 +11,7 @@ export function ManageEvents() {
   const [events, setEvents] = useState([]);
   const [categories, setCategories] = useState([]); 
   const [users, setUsers] = useState([]); 
-console.log(editingEvent)
+
   const handleSubmit = async (event) => {
     try {
       if (editingEvent) {
