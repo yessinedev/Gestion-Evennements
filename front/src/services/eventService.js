@@ -21,6 +21,12 @@ export const deleteEvent = async (eventId) => {
     const { data } = await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/events/${eventId}`)
     return data;
 }
+
+export const searchEventByName = async (name) => {
+  const { data } = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/events/search/${name}`);
+  return data;
+};
+
   
 
 
