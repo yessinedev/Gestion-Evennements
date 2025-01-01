@@ -61,31 +61,7 @@ export function ManageEvents() {
     }
   };
   
-  const handleSearch = async (name) => {
-    try {
-      if (name.trim() === "") {
-        fetchAllEvents();
-        return;
-      }
-      const { data } = await axios({
-        method: "get",
-        url: `${import.meta.env.VITE_API_BASE_URL}/events/search/${name}`,
-        headers: {
-          "Content-Type": "application/json", 
-        },
-      });
   
-      setEvents(data); 
-      alert("Search completed successfully!");
-    } catch (error) {
-      console.error("Error searching events:", error.message);
-      alert("No events found with that name.");
-      setEvents([]); 
-    }
-  };
-  
-
-
   const fetchAllEvents = async () => {
     try {
       const data = await fetchEvents();
