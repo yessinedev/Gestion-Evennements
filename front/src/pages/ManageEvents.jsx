@@ -92,10 +92,12 @@ export function ManageEvents() {
     }
   };
 
+
   useEffect(() => {
     fetchAllEvents();
     fetchAllCategories();
     fetchAllUsers();
+
   }, []);
 
   return (

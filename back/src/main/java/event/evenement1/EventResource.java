@@ -150,17 +150,25 @@ public class EventResource {
     }
 
 
-    @DELETE
     @Path("/{id}")
+    @DELETE
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteEvent(@PathParam("id") String id) {
-        String query = "DELETE FROM events WHERE id = ?";
+        String deleteParticipantsQuery = "DELETE FROM event_participants WHERE event_id = ?";
+        String deleteEventQuery = "DELETE FROM events WHERE id = ?";
 
         try (Connection connection = DatabaseConnection.getConnection();
-             PreparedStatement ps = connection.prepareStatement(query)) {
+             PreparedStatement psParticipants = connection.prepareStatement(deleteParticipantsQuery);
+             PreparedStatement psEvent = connection.prepareStatement(deleteEventQuery)) {
 
-            ps.setString(1, id);
-            int rowsAffected = ps.executeUpdate();
+            // Delete participants first
+            psParticipants.setString(1, id);
+            psParticipants.executeUpdate();
+
+            // Then delete the event
+            psEvent.setString(1, id);
+            int rowsAffected = psEvent.executeUpdate();
+
             if (rowsAffected > 0) {
                 return Response.ok("Event deleted successfully!").build();
             } else {
