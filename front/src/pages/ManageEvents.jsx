@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { EventForm } from '../components/EventForm';
 import { EventCard } from '../components/EventCard';
-import { fetchEvents, createEvent, updateEvent, deleteEvent } from '../services/eventService';
+import { fetchEvents} from '../services/eventService';
 import { fetchCategories } from '../services/categoryService';
 import axios from 'axios';
 import { fetchUsers } from '../services/userService';
@@ -61,28 +61,7 @@ export function ManageEvents() {
     }
   };
   
-  const handleSearch = async (name) => {
-    try {
-      if (name.trim() === "") {
-        fetchAllEvents();
-        return;
-      }
-      const { data } = await axios({
-        method: "get",
-        url: `${import.meta.env.VITE_API_BASE_URL}/events/search/${name}`,
-        headers: {
-          "Content-Type": "application/json", 
-        },
-      });
-  
-      setEvents(data); 
-      alert("Search completed successfully!");
-    } catch (error) {
-      console.error("Error searching events:", error.message);
-      alert("No events found with that name.");
-      setEvents([]); 
-    }
-  };
+ 
   
 
 

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { SearchIcon } from "lucide-react";
 import { EventCard } from "../components/EventCard";
 import { fetchEvents, participateToEvent } from "../services/eventService";
+import axios from "axios";
 
 export function EventList() {
   const [search, setSearch] = useState(""); 
@@ -24,10 +25,29 @@ export function EventList() {
 
   // Filtrer les événements en fonction de la recherche
   useEffect(() => {
-    const filtered = events.filter((event) =>
-      event.name.toLowerCase().includes(search.toLowerCase())
-    );
-    setFilteredEvents(filtered);
+    const handleSearch = async (name) => {
+      try {
+        if (name.trim() === "") {
+          setFilteredEvents(events);
+          return;
+        }
+        const { data } = await axios({
+          method: "get",
+          url: `${import.meta.env.VITE_API_BASE_URL}/events/search/${name}`,
+          headers: {
+            "Content-Type": "application/json", 
+          },
+        });
+    
+        setFilteredEvents(data); 
+      } catch (error) {
+        console.error("Error searching events:", error.message);
+        setFilteredEvents([]); 
+      }
+    };
+
+    handleSearch(search);
+    
   }, [search, events]);
 
   const participateInEvent = async (eventId) => {
@@ -52,6 +72,8 @@ export function EventList() {
     }
   };
 
+  
+
   return (
     <div className="max-w-4xl mx-auto p-6">
       <h1 className="text-3xl font-bold text-gray-900 mb-8">Upcoming Events</h1>
@@ -63,7 +85,7 @@ export function EventList() {
           type="text"
           placeholder="Search events..."
           value={search}
-          onChange={(e) => handleSearch(e.target.value)}
+          onChange={(e) => setSearch(e.target.value)}
           className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>

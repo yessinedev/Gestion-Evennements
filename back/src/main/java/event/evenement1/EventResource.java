@@ -216,8 +216,16 @@ public class EventResource {
     @Path("/search/{name}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response searchEventByName(@PathParam("name") String name) {
-        String query = "SELECT * FROM events WHERE name LIKE ?";
-        List<Event> events = new ArrayList<>();
+        String query = "SELECT \n" +
+                "        e.id, e.name, e.description, e.date, e.location, e.type, \n" +
+                "        e.join_code, e.limit_participants, \n" +
+                "        c.id AS category_id, c.name AS category_name, \n" +
+                "        u.id AS organizer_id, u.name AS organizer_name\n" +
+                "    FROM events e\n" +
+                "    JOIN categories c ON e.category_id = c.id\n" +
+                "    JOIN users u ON e.organizer_id = u.id" +
+                "    WHERE e.name LIKE ?";
+        List<EventDTO> events = new ArrayList<>();
 
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement ps = connection.prepareStatement(query)) {
@@ -225,7 +233,9 @@ public class EventResource {
             ps.setString(1, "%" + name + "%"); // Recherche partielle
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    events.add(mapResultSetToEvent(rs));
+                    Event event = mapResultSetToEvent(rs);
+                    EventDTO eventDTO = mapToEventDTO(event); // Map Event to EventDTO
+                    events.add(eventDTO);
                 }
             }
 
