@@ -189,11 +189,15 @@ public class EventResource {
     @Path("/category/name/{categoryName}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getEventsByCategoryName(@PathParam("categoryName") String categoryName) {
-        String query = "SELECT e.* FROM events e " +
+        String query = "SELECT e.*, " +
+                "c.id AS category_id, c.name AS category_name, " +
+                "u.id AS organizer_id, u.name AS organizer_name " +
+                "FROM events e " +
                 "JOIN categories c ON e.category_id = c.id " +
+                "JOIN users u ON e.organizer_id = u.id " + // Assuming 'users' is the table for organizers
                 "WHERE c.name = ?";
 
-        List<Event> events = new ArrayList<>();
+        List<EventDTO> events = new ArrayList<>();
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement ps = connection.prepareStatement(query)) {
 
@@ -201,7 +205,9 @@ public class EventResource {
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    events.add(mapResultSetToEvent(rs));
+                    Event event = mapResultSetToEvent(rs);
+                    EventDTO eventDTO = mapToEventDTO(event);
+                    events.add(eventDTO);
                 }
             }
 
